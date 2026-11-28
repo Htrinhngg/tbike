@@ -167,7 +167,7 @@ export function RequestDetailPage() {
           <RescheduleModal open={resOpen} onClose={() => setResOpen(false)} order={r} onDone={(res) => setWarnings(res.canh_bao)} />
           <Modal open={rejectOpen} title={`Từ chối ${r.ma_yeu_cau}?`} onClose={() => setRejectOpen(false)}
             footer={<><Button variant="secondary" onClick={() => setRejectOpen(false)}>Hủy</Button><Button variant="danger" loading={reject.isPending} disabled={reason.trim().length < 3} onClick={() => reject.mutate()}>Từ chối yêu cầu</Button></>}>
-            <Field label="Lý do từ chối" required htmlFor="lydo" helper="Khách sẽ thấy lý do này khi tra cứu." error={reject.error ? errorMessage(reject.error) : undefined}>
+            <Field label="Lý do từ chối" required htmlFor="lydo" helper="Khách sẽ thấy lý do này khi tra cứu. Tối thiểu 3 ký tự." error={reject.error ? errorMessage(reject.error) : reason.trim().length > 0 && reason.trim().length < 3 ? `Lý do cần tối thiểu 3 ký tự (hiện có ${reason.trim().length}).` : undefined}>
               <textarea id="lydo" className={cx(inputClass, "h-24 py-2.5")} maxLength={255} value={reason} onChange={(e) => setReason(e.target.value)} />
             </Field>
           </Modal>
