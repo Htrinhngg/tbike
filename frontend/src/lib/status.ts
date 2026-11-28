@@ -27,3 +27,21 @@ export const DELIVERY: Record<HinhThucNhanXe, string> = { TaiCuaHang: "Nhận t�
 
 /** Thu tu tien trinh hien thi cho khach / nhan vien */
 export const PROGRESS: TrangThaiXuLy[] = ["DaGui", "DaXacNhan", "DangThue", "HoanTat"];
+
+/** So phut tre so voi gio tra du kien cua don DANG THUE chua nhan lai xe; null neu khong tre. */
+export function lateReturnMinutes(
+  r: { trang_thai_xu_ly: TrangThaiXuLy; thoi_gian_tra_thuc_te: string | null; thoi_gian_tra_du_kien: string },
+  now: number = Date.now(),
+): number | null {
+  if (r.trang_thai_xu_ly !== "DangThue" || r.thoi_gian_tra_thuc_te) return null;
+  const diff = Math.floor((now - new Date(r.thoi_gian_tra_du_kien).getTime()) / 60000);
+  return diff > 0 ? diff : null;
+}
+
+/** 95 -> "1 giờ 35 phút"; 2580 -> "1 ngày 19 giờ" */
+export function formatLate(minutes: number): string {
+  const d = Math.floor(minutes / 1440), h = Math.floor((minutes % 1440) / 60), m = minutes % 60;
+  if (d > 0) return h > 0 ? `${d} ngày ${h} giờ` : `${d} ngày`;
+  if (h > 0) return m > 0 ? `${h} giờ ${m} phút` : `${h} giờ`;
+  return `${m} phút`;
+}

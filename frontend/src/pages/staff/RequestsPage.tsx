@@ -6,7 +6,7 @@ import { IconAlert, IconRefresh } from "../../components/Icons";
 import { Alert, Badge, Button, cx, EmptyState, ErrorState, inputClass, LoadingState, PageHeading, Pagination } from "../../components/ui";
 import { errorMessage } from "../../lib/api";
 import { formatDateTime, formatVnd } from "../../lib/format";
-import { DEPOSIT_STATUS, REQUEST_STATUS } from "../../lib/status";
+import { DEPOSIT_STATUS, formatLate, lateReturnMinutes, REQUEST_STATUS } from "../../lib/status";
 import type { RentalRequest, TrangThaiXuLy } from "../../lib/types";
 import { qk } from "../../services/queryKeys";
 import { rentalsApi } from "../../services/rentalsApi";
@@ -44,6 +44,7 @@ export function RequestsPage() {
     placeholderData: keepPreviousData,
   });
   const conflicts = list.data?.items.filter((r) => r.co_trung_lich) ?? [];
+  const late = (list.data?.items ?? []).map((r) => ({ r, min: lateReturnMinutes(r) })).filter((x): x is { r: RentalRequest; min: number } => x.min !== null);
   const set = (patch: Record<string, string>) => {
     const n = new URLSearchParams(params);
     Object.entries(patch).forEach(([k, v]) => (v ? n.set(k, v) : n.delete(k)));
@@ -55,6 +56,12 @@ export function RequestsPage() {
     <StaffLayout breadcrumb={["Yêu cầu & đơn thuê"]}>
       <PageHeading eyebrow="T-Bike Đà Nẵng" title="Yêu cầu & đơn thuê" subtitle="Tiếp nhận yêu cầu, kiểm tra lịch và theo dõi giao nhận xe."
         actions={<Button variant="secondary" icon={<IconRefresh size={16} />} loading={list.isFetching} onClick={() => list.refetch()}>Làm mới</Button>} />
+      {late.length > 0 && (
+        <Alert tone="danger" title={`Xe trả trễ hạn • ${late.length} đơn`}>
+          {late.slice(0, 3).map(({ r, min }) => `${r.ma_don_thue} (${r.ma_xe} – ${r.ho_ten_khach}, trễ ${formatLate(min)})`).join("; ")}.
+          {" "}Gọi khách xác nhận giờ trả. Xe được giữ cho đơn này, không nhận lịch mới cho tới khi nhận lại xe; phụ phí trễ tính tự động khi nhận xe.
+        </Alert>
+      )}
       {conflicts.length > 0 && (
         <Alert tone="warning" title={`Cảnh báo trùng lịch • ${conflicts.length} yêu cầu`}>
           {conflicts.slice(0, 3).map((c) => `${c.ma_yeu_cau} (${c.ma_xe})`).join(", ")} trùng với đơn đã xác nhận. Cần đổi xe/thời gian hoặc từ chối trước khi xác nhận.
@@ -82,8 +89,8 @@ export function RequestsPage() {
             <tbody>{list.data.items.map((r) => {
               const a = action(r);
               return (
-                <tr key={r.ma_yeu_cau} className={cx("border-t border-line", (r.co_trung_lich || r.qua_han_nhan) && "bg-warning-bg")}>
-                  <td className="px-5 py-3.5"><p className="font-semibold text-primary">{r.ma_don_thue ?? r.ma_yeu_cau}</p>{r.qua_han_nhan && <p className="text-xs font-semibold text-danger">Quá giờ nhận</p>}{r.hinh_thuc_nhan_xe === "GiaoTanNoi" && <p className="text-xs text-info">Giao tận nơi</p>}</td>
+                <tr key={r.ma_yeu_cau} className={cx("border-t border-line", lateReturnMinutes(r) !== null ? "bg-danger-bg" : (r.co_trung_lich || r.qua_han_nhan) && "bg-warning-bg")}>
+                  <td className="px-5 py-3.5"><p className="font-semibold text-primary">{r.ma_don_thue ?? r.ma_yeu_cau}</p>{r.qua_han_nhan && <p className="text-xs font-semibold text-danger">Quá giờ nhận</p>}{(() => { const m = lateReturnMinutes(r); return m !== null && <p className="flex items-center gap-1 whitespace-nowrap text-xs font-semibold text-danger"><IconAlert size={12} />Trễ hạn trả • {formatLate(m)}</p>; })()}{r.hinh_thuc_nhan_xe === "GiaoTanNoi" && <p className="text-xs text-info">Giao tận nơi</p>}</td>
                   <td className="px-5 py-3.5"><p className="font-semibold">{r.ho_ten_khach}</p><p className="text-xs text-ink-muted">{r.so_dien_thoai}</p></td>
                   <td className="px-5 py-3.5"><p className="font-semibold">{r.ma_xe}</p><p className="text-xs text-ink-muted">{r.ten_xe}</p></td>
                   <td className="px-5 py-3.5 text-[13px]">{formatDateTime(r.thoi_gian_nhan_du_kien)}<br />→ {formatDateTime(r.thoi_gian_tra_du_kien)}</td>

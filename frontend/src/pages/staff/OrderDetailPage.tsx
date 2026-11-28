@@ -7,7 +7,7 @@ import { RescheduleModal, ScheduleHistoryList } from "../../components/Reschedul
 import { Alert, Badge, Button, cx, DetailRow, EmptyState, ErrorState, inputClass, LoadingState, PageHeading, Panel } from "../../components/ui";
 import { errorMessage } from "../../lib/api";
 import { formatDateTime, formatKm, formatVnd } from "../../lib/format";
-import { DEPOSIT_STATUS, REQUEST_STATUS } from "../../lib/status";
+import { DEPOSIT_STATUS, formatLate, lateReturnMinutes, REQUEST_STATUS } from "../../lib/status";
 import { invalidateOperational, qk } from "../../services/queryKeys";
 import { rentalsApi } from "../../services/rentalsApi";
 import { useOrder } from "./useOrder";
@@ -57,6 +57,15 @@ export function OrderDetailPage() {
               Khách hẹn nhận lúc {formatDateTime(o.thoi_gian_nhan_du_kien)} nhưng chưa giao xe. Gọi khách thống nhất lại lịch trước khi giao.
             </Alert>
           )}
+          {(() => {
+            const m = lateReturnMinutes(o);
+            return m !== null && (
+              <Alert tone="danger" title={`Quá giờ trả dự kiến • trễ ${formatLate(m)}`}
+                action={<Link to={`/nhan-vien/don/${maDon}/nhan-xe`} className="btn-gradient inline-flex h-11 items-center whitespace-nowrap rounded-lg px-5 text-sm font-semibold">Nhận xe</Link>}>
+                Khách hẹn trả lúc {formatDateTime(o.thoi_gian_tra_du_kien)} nhưng chưa trả xe. Gọi khách xác nhận giờ trả. Xe được giữ cho đơn này và không nhận lịch mới cho tới khi nhận lại xe; phụ phí trễ được tính tự động khi nhận xe.
+              </Alert>
+            );
+          })()}
           {o.trang_thai_xu_ly === "HoanTat" && <Alert tone="info" title="Đơn đã hoàn tất">Dữ liệu ODO, thời gian và phí đã khóa, không chỉnh sửa được.</Alert>}
           <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
             <div className="space-y-6">
@@ -80,7 +89,7 @@ export function OrderDetailPage() {
                 <DetailRow label="Quãng đường">{formatKm(o.quang_duong_luot_thue)}</DetailRow>
                 <DetailRow label="Phụ phí trễ" tone={o.phu_phi_tre_han_vnd ? "warning" : undefined}>{o.thoi_gian_tra_thuc_te ? formatVnd(o.phu_phi_tre_han_vnd) : "Tính khi nhận xe"}</DetailRow>
               </Panel>
-              {next && <div className="flex justify-end"><Link to={next.to} className="inline-flex h-11 items-center rounded-lg btn-gradient px-5 text-sm font-semibold text-white">{next.label}</Link></div>}
+              {next && <div className="flex justify-end"><Link to={next.to} className="inline-flex h-11 items-center rounded-lg bg-brand-gradient px-5 text-sm font-semibold text-white hover:bg-brand-gradient-hover">{next.label}</Link></div>}
             </div>
             <aside className="space-y-6">
               <Panel title="Bảo đảm thuê xe">
