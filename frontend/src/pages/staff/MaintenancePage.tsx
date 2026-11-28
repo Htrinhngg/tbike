@@ -65,7 +65,7 @@ export function MaintenancePage() {
           {due.data?.length === 0 && <EmptyState icon={<IconCheckCircle size={32} className="text-success" />} title="Tất cả xe đều dưới ngưỡng 2.000 km" />}
           {!!due.data?.length && (
             <div className="overflow-x-auto rounded-[10px] border border-line"><table className="w-full min-w-[560px] text-left text-sm">
-              <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-4 py-3">Mã xe</th><th className="px-4 py-3">Xe</th><th className="px-4 py-3">ODO hiện tại</th><th className="px-4 py-3">ODO BD gần nhất</th><th className="px-4 py-3">Đã đi từ BD</th><th /></tr></thead>
+              <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-4 py-3 whitespace-nowrap">Mã xe</th><th className="px-4 py-3 whitespace-nowrap">Xe</th><th className="px-4 py-3 whitespace-nowrap">ODO hiện tại</th><th className="px-4 py-3 whitespace-nowrap">ODO BD gần nhất</th><th className="px-4 py-3 whitespace-nowrap">Đã đi từ BD</th><th /></tr></thead>
               <tbody>{due.data.map((x) => (
                 <tr key={x.ma_xe} className={cx("border-t border-line", selected === x.ma_xe && "bg-primary-soft")}>
                   <td className="px-4 py-3.5 font-semibold text-primary">{x.ma_xe}</td>

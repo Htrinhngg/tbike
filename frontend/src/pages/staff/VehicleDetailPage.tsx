@@ -28,7 +28,7 @@ export function VehicleDetailPage() {
         <>
           <PageHeading eyebrow={`Đội xe / ${v.ma_xe}`} title={v.ten_xe} subtitle={VEHICLE_TYPE[v.loai_xe]}
             actions={<><Badge tone={VEHICLE_STATUS[v.trang_thai].tone}>{VEHICLE_STATUS[v.trang_thai].label}</Badge>
-              {v.trang_thai !== "DangThue" && <Link to={`/nhan-vien/bao-duong?xe=${v.ma_xe}`} className="inline-flex h-11 items-center rounded-lg btn-gradient px-5 text-sm font-semibold text-white">Ghi nhận bảo dưỡng</Link>}</>} />
+              {v.trang_thai !== "DangThue" && <Link to={`/nhan-vien/bao-duong?xe=${v.ma_xe}`} className="inline-flex h-11 items-center rounded-lg bg-brand-gradient px-5 text-sm font-semibold text-white hover:bg-brand-gradient-hover">Ghi nhận bảo dưỡng</Link>}</>} />
           <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
             <Panel>
               <div className="flex flex-col gap-6 sm:flex-row">
@@ -54,7 +54,7 @@ export function VehicleDetailPage() {
             <Panel title="Lịch sử ODO" caption="Mỗi lần giao/nhận và bảo dưỡng đều được ghi lại, không chỉnh sửa sau khi đơn hoàn tất.">
               {v.lich_su_odo.length === 0 ? <p className="text-[13px] text-ink-muted">Chưa có lần giao/nhận hoặc bảo dưỡng nào.</p> : (
                 <div className="overflow-x-auto"><table className="w-full min-w-[560px] text-left text-sm">
-                  <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-4 py-3">Thời điểm</th><th className="px-4 py-3">Sự kiện</th><th className="px-4 py-3">Đơn</th><th className="px-4 py-3">ODO</th><th className="px-4 py-3">Quãng đường</th><th className="px-4 py-3">Người ghi</th></tr></thead>
+                  <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-4 py-3 whitespace-nowrap">Thời điểm</th><th className="px-4 py-3 whitespace-nowrap">Sự kiện</th><th className="px-4 py-3 whitespace-nowrap">Đơn</th><th className="px-4 py-3 whitespace-nowrap">ODO</th><th className="px-4 py-3 whitespace-nowrap">Quãng đường</th><th className="px-4 py-3 whitespace-nowrap">Người ghi</th></tr></thead>
                   <tbody>{v.lich_su_odo.map((e, i) => (
                     <tr key={i} className={`border-t border-line ${e.su_kien === "BaoDuong" ? "bg-success-bg" : ""}`}>
                       <td className="px-4 py-3">{formatDateTime(e.thoi_diem)}</td><td className="px-4 py-3">{EVENT[e.su_kien]}</td>

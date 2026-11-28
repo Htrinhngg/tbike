@@ -65,7 +65,7 @@ export function RequestsPage() {
           <div className="flex flex-wrap gap-2" role="tablist">
             {TABS.map(([key, label]) => (
               <button key={key} role="tab" aria-selected={tab[0] === key} onClick={() => set({ tab: key })}
-                className={cx("rounded-full px-3.5 py-2 text-[13px] font-semibold", tab[0] === key ? "btn-gradient text-white" : "border border-line bg-subtle text-ink")}>{label}</button>
+                className={cx("rounded-full px-3.5 py-2 text-[13px] font-semibold", tab[0] === key ? "bg-brand-gradient text-white" : "border border-line bg-subtle text-ink")}>{label}</button>
             ))}
           </div>
           <form className="flex gap-3" onSubmit={(e) => { e.preventDefault(); set({ q: search.trim() }); }}>
@@ -78,7 +78,7 @@ export function RequestsPage() {
         {list.data?.items.length === 0 && <EmptyState title="Không có yêu cầu nào" description={q ? "Không có kết quả khớp từ khóa tìm kiếm." : "Yêu cầu mới từ khách sẽ hiện ở đây."} />}
         {!!list.data?.items.length && (
           <div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm">
-            <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-5 py-3">Mã yêu cầu/đơn</th><th className="px-5 py-3">Khách hàng</th><th className="px-5 py-3">Xe</th><th className="px-5 py-3">Nhận → Trả dự kiến</th><th className="px-5 py-3">Trạng thái</th><th className="px-5 py-3">Bảo đảm</th><th className="px-5 py-3">Tiền thuê</th><th /></tr></thead>
+            <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-5 py-3 whitespace-nowrap">Mã yêu cầu/đơn</th><th className="px-5 py-3 whitespace-nowrap">Khách hàng</th><th className="px-5 py-3 whitespace-nowrap">Xe</th><th className="px-5 py-3 whitespace-nowrap">Nhận → Trả dự kiến</th><th className="px-5 py-3 whitespace-nowrap">Trạng thái</th><th className="px-5 py-3 whitespace-nowrap">Bảo đảm</th><th className="px-5 py-3 whitespace-nowrap">Tiền thuê</th><th /></tr></thead>
             <tbody>{list.data.items.map((r) => {
               const a = action(r);
               return (
@@ -91,7 +91,7 @@ export function RequestsPage() {
                   <td className="px-5 py-3.5 text-[13px]">{r.ten_phuong_thuc_bao_dam ?? <span className="text-ink-muted">Chưa chọn</span>}<br /><span className="text-xs text-ink-muted">{DEPOSIT_STATUS[r.trang_thai_bao_dam].label}</span>
                     {r.co_trung_lich && <p className="flex items-center gap-1 text-xs font-semibold text-warning"><IconAlert size={12} />Trùng lịch {r.ma_xe}</p>}</td>
                   <td className="px-5 py-3.5">{formatVnd(r.tien_thue_du_kien_vnd)}</td>
-                  <td className="px-5 py-3.5 text-right"><Link to={a.to} className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold text-primary">{a.label}</Link></td>
+                  <td className="px-5 py-3.5 text-right"><Link to={a.to} className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold text-primary inline-flex whitespace-nowrap">{a.label}</Link></td>
                 </tr>
               );
             })}</tbody>

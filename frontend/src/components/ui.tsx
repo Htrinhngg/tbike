@@ -24,7 +24,7 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cx(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed",
+        "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed",
         size === "sm" && "h-8 px-3 text-[13px]",
         size === "md" && "h-11 px-5 text-sm",
         size === "lg" && "h-12 px-6 text-[15px]",

@@ -51,7 +51,7 @@ export function DashboardPage() {
             <Panel title="Giao / nhận xe hôm nay" caption="Sắp xếp theo giờ hẹn. Đơn quá hạn được đưa lên đầu." actions={<Link to="/nhan-vien/yeu-cau" className="text-[13px] font-semibold text-primary">Xem tất cả</Link>}>
               {s.viec_hom_nay.length === 0 ? <EmptyState title="Không có lịch giao/nhận hôm nay" icon={<IconClock size={28} />} /> : (
                 <div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-sm">
-                  <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-4 py-3">Giờ</th><th className="px-4 py-3">Việc</th><th className="px-4 py-3">Đơn • Khách</th><th className="px-4 py-3">Xe</th><th className="px-4 py-3">Trạng thái</th><th className="px-4 py-3" /></tr></thead>
+                  <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-4 py-3 whitespace-nowrap">Giờ</th><th className="px-4 py-3 whitespace-nowrap">Việc</th><th className="px-4 py-3 whitespace-nowrap">Đơn • Khách</th><th className="px-4 py-3 whitespace-nowrap">Xe</th><th className="px-4 py-3 whitespace-nowrap">Trạng thái</th><th className="px-4 py-3 whitespace-nowrap" /></tr></thead>
                   <tbody>{s.viec_hom_nay.map((t) => (
                     <tr key={t.ma_yeu_cau + t.loai} className={cx("border-t border-line", t.qua_han && "bg-warning-bg")}>
                       <td className={cx("px-4 py-3.5 font-semibold", t.qua_han && "text-danger")}>{formatTime(t.thoi_diem)}</td>
@@ -59,7 +59,7 @@ export function DashboardPage() {
                       <td className="px-4 py-3.5"><p className="font-semibold">{t.ma_don_thue ?? t.ma_yeu_cau}</p><p className="text-xs text-ink-muted">{t.ho_ten_khach}</p></td>
                       <td className="px-4 py-3.5"><p className="font-semibold">{t.ma_xe}</p><p className="text-xs text-ink-muted">{t.ten_xe}</p></td>
                       <td className="px-4 py-3.5">{t.qua_han ? <Badge tone="warning">Quá hạn {formatShortDateTime(t.thoi_diem)}</Badge> : <Badge tone={REQUEST_STATUS[t.trang_thai_xu_ly].tone}>{REQUEST_STATUS[t.trang_thai_xu_ly].label}</Badge>}</td>
-                      <td className="px-4 py-3.5 text-right">{t.ma_don_thue && <Link className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold text-primary" to={`/nhan-vien/don/${t.ma_don_thue}/${t.loai === "GiaoXe" ? "giao-xe" : "nhan-xe"}`}>{t.loai === "GiaoXe" ? "Giao xe" : "Nhận xe"}</Link>}</td>
+                      <td className="px-4 py-3.5 text-right">{t.ma_don_thue && <Link className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold text-primary inline-flex whitespace-nowrap" to={`/nhan-vien/don/${t.ma_don_thue}/${t.loai === "GiaoXe" ? "giao-xe" : "nhan-xe"}`}>{t.loai === "GiaoXe" ? "Giao xe" : "Nhận xe"}</Link>}</td>
                     </tr>))}</tbody>
                 </table></div>
               )}
@@ -81,7 +81,7 @@ export function DashboardPage() {
                 {s.xe_can_bao_duong_top.length === 0 ? <p className="text-[13px] text-success">Tất cả xe đều dưới ngưỡng 2.000 km.</p> : (
                   <ul className="space-y-3">{s.xe_can_bao_duong_top.map((v) => (
                     <li key={v.ma_xe} className="flex items-center gap-3"><div className="flex-1"><p className="text-sm font-semibold">{v.ma_xe} • {v.ten_xe}</p><p className="text-xs text-warning">Từ lần bảo dưỡng: {formatKm(v.km_tu_lan_bao_duong)}</p></div>
-                      <Link to={`/nhan-vien/bao-duong?xe=${v.ma_xe}`} className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold text-primary">Ghi nhận</Link></li>))}</ul>
+                      <Link to={`/nhan-vien/bao-duong?xe=${v.ma_xe}`} className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold text-primary inline-flex whitespace-nowrap">Ghi nhận</Link></li>))}</ul>
                 )}
                 <Link to="/nhan-vien/bao-duong" className="mt-4 flex h-11 items-center justify-center rounded-lg border border-line text-sm font-semibold text-primary">Xem tất cả {s.xe_can_bao_duong} xe</Link>
               </Panel>
@@ -90,7 +90,7 @@ export function DashboardPage() {
           <Panel title="Đơn trả trễ cần thu phụ phí" caption="Trong 24 giờ đầu: < 1 giờ = 0đ • 1–8 giờ = ½ ngày • > 8 giờ = 1 ngày. Từ 24 giờ trở lên: làm tròn lên theo ngày.">
             {s.don_tra_tre.length === 0 ? <p className="text-[13px] text-ink-muted">Không có đơn trả trễ chờ đóng.</p> : (
               <div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm">
-                <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-4 py-3">Đơn</th><th className="px-4 py-3">Xe</th><th className="px-4 py-3">Trả dự kiến → thực tế</th><th className="px-4 py-3">Trễ</th><th className="px-4 py-3">Mức áp dụng</th><th className="px-4 py-3">Phụ phí</th><th /></tr></thead>
+                <thead><tr className="bg-subtle text-eyebrow uppercase text-ink-muted"><th className="px-4 py-3 whitespace-nowrap">Đơn</th><th className="px-4 py-3 whitespace-nowrap">Xe</th><th className="px-4 py-3 whitespace-nowrap">Trả dự kiến → thực tế</th><th className="px-4 py-3 whitespace-nowrap">Trễ</th><th className="px-4 py-3 whitespace-nowrap">Mức áp dụng</th><th className="px-4 py-3 whitespace-nowrap">Phụ phí</th><th /></tr></thead>
                 <tbody>{s.don_tra_tre.map((o) => (
                   <tr key={o.ma_don_thue} className="border-t border-line">
                     <td className="px-4 py-3.5 font-semibold">{o.ma_don_thue}</td>
@@ -99,7 +99,7 @@ export function DashboardPage() {
                     <td className={cx("px-4 py-3.5 font-semibold", o.he_so_phi_tre_ap_dung >= 1 ? "text-danger" : "text-warning")}>{formatDuration(Math.round(o.so_gio_tre * 60))}</td>
                     <td className="px-4 py-3.5">{formatDayFactor(o.he_so_phi_tre_ap_dung)}</td>
                     <td className="px-4 py-3.5 font-semibold">{formatVnd(o.phu_phi_tre_han_vnd)}</td>
-                    <td className="px-4 py-3.5 text-right"><Link to={`/nhan-vien/don/${o.ma_don_thue}/hoan-tat`} className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold text-primary">Hoàn tất trả</Link></td>
+                    <td className="px-4 py-3.5 text-right"><Link to={`/nhan-vien/don/${o.ma_don_thue}/hoan-tat`} className="rounded-lg border border-line px-3 py-1.5 text-[13px] font-semibold text-primary inline-flex whitespace-nowrap">Hoàn tất trả</Link></td>
                   </tr>))}</tbody>
               </table></div>
             )}
