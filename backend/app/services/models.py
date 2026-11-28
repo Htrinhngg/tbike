@@ -41,7 +41,7 @@ def public_models(conn: Connection, tu: datetime | None, den: datetime | None, l
                             select 1 from public.yeu_cau_thue o
                             where o.ma_xe = x.ma_xe and o.trang_thai_xu_ly in ('DaXacNhan', 'DangThue')
                               and o.thoi_gian_nhan_du_kien < %(den)s::timestamptz
-                              and o.thoi_gian_tra_du_kien > %(tu)s::timestamptz))) as so_xe_trong
+                              and (case when o.trang_thai_xu_ly = 'DangThue' and o.thoi_gian_tra_thuc_te is null and o.thoi_gian_tra_du_kien <= coalesce(nullif(current_setting('tbike.now', true), '')::timestamptz, now()) then 'infinity'::timestamptz else o.thoi_gian_tra_du_kien end) > %(tu)s::timestamptz))) as so_xe_trong
                from public.mau_xe m
                join public.bang_gia_thue g on g.loai_xe = m.loai_xe
                join public.xe x on x.ma_mau = m.ma_mau

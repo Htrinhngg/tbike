@@ -20,13 +20,15 @@ join public.bang_gia_thue g on g.loai_xe = x.loai_xe
 """
 
 # Dieu kien giao nhau cua khoang [nhan, tra) - hai don sat nhau (tra = nhan) KHONG tinh la trung.
+# Don DangThue da qua gio tra du kien ma CHUA nhan lai xe: xe van ban cho toi khi nhan xe
+# (khoang ban keo dai vo han) -> khong gan xe tre han cho khach moi.
 OVERLAP_SQL = """
 select o.ma_yeu_cau, o.ma_don_thue, o.thoi_gian_nhan_du_kien, o.thoi_gian_tra_du_kien
 from public.yeu_cau_thue o
 where o.ma_xe = %(ma_xe)s
   and o.trang_thai_xu_ly in ('DaXacNhan', 'DangThue')
   and o.thoi_gian_nhan_du_kien < %(den)s
-  and o.thoi_gian_tra_du_kien > %(tu)s
+  and (case when o.trang_thai_xu_ly = 'DangThue' and o.thoi_gian_tra_thuc_te is null and o.thoi_gian_tra_du_kien <= coalesce(nullif(current_setting('tbike.now', true), '')::timestamptz, now()) then 'infinity'::timestamptz else o.thoi_gian_tra_du_kien end) > %(tu)s
   and (%(exclude)s::varchar is null or o.ma_yeu_cau <> %(exclude)s::varchar)
 """
 
@@ -48,7 +50,7 @@ select y.ma_yeu_cau, y.ma_don_thue, y.ma_xe, x.ma_mau, x.ten_xe, x.loai_xe::text
           where o.ma_xe = y.ma_xe and o.ma_yeu_cau <> y.ma_yeu_cau
             and o.trang_thai_xu_ly in ('DaXacNhan', 'DangThue')
             and o.thoi_gian_nhan_du_kien < y.thoi_gian_tra_du_kien
-            and o.thoi_gian_tra_du_kien > y.thoi_gian_nhan_du_kien)
+            and (case when o.trang_thai_xu_ly = 'DangThue' and o.thoi_gian_tra_thuc_te is null and o.thoi_gian_tra_du_kien <= coalesce(nullif(current_setting('tbike.now', true), '')::timestamptz, now()) then 'infinity'::timestamptz else o.thoi_gian_tra_du_kien end) > y.thoi_gian_nhan_du_kien)
         -- chi tinh la trung neu KHONG con xe khac cung mau trong lich (CR-02)
         and not exists (
           select 1 from public.xe a
@@ -57,7 +59,7 @@ select y.ma_yeu_cau, y.ma_don_thue, y.ma_xe, x.ma_mau, x.ten_xe, x.loai_xe::text
               select 1 from public.yeu_cau_thue o2
               where o2.ma_xe = a.ma_xe and o2.trang_thai_xu_ly in ('DaXacNhan', 'DangThue')
                 and o2.thoi_gian_nhan_du_kien < y.thoi_gian_tra_du_kien
-                and o2.thoi_gian_tra_du_kien > y.thoi_gian_nhan_du_kien))) as co_trung_lich
+                and (case when o2.trang_thai_xu_ly = 'DangThue' and o2.thoi_gian_tra_thuc_te is null and o2.thoi_gian_tra_du_kien <= coalesce(nullif(current_setting('tbike.now', true), '')::timestamptz, now()) then 'infinity'::timestamptz else o2.thoi_gian_tra_du_kien end) > y.thoi_gian_nhan_du_kien))) as co_trung_lich
 from public.yeu_cau_thue y
 join public.xe x on x.ma_xe = y.ma_xe
 join public.bang_gia_thue g on g.loai_xe = x.loai_xe

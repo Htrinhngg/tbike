@@ -122,7 +122,7 @@ def _pick_unit(conn: Connection, ma_mau: str, tu: datetime, den: datetime) -> st
                  and not exists (
                    select 1 from public.yeu_cau_thue o
                    where o.ma_xe = x.ma_xe and o.trang_thai_xu_ly in ('DaXacNhan', 'DangThue')
-                     and o.thoi_gian_nhan_du_kien < %(den)s and o.thoi_gian_tra_du_kien > %(tu)s)
+                     and o.thoi_gian_nhan_du_kien < %(den)s and (case when o.trang_thai_xu_ly = 'DangThue' and o.thoi_gian_tra_thuc_te is null and o.thoi_gian_tra_du_kien <= coalesce(nullif(current_setting('tbike.now', true), '')::timestamptz, now()) then 'infinity'::timestamptz else o.thoi_gian_tra_du_kien end) > %(tu)s)
                order by (select count(*) from public.yeu_cau_thue p
                          where p.ma_xe = x.ma_xe and p.trang_thai_xu_ly = 'DaGui'
                            and p.thoi_gian_nhan_du_kien < %(den)s and p.thoi_gian_tra_du_kien > %(tu)s),
@@ -322,7 +322,7 @@ def _free_siblings(conn: Connection, ma_yeu_cau: str, ma_xe: str, tu: datetime, 
               and not exists (
                 select 1 from public.yeu_cau_thue o
                 where o.ma_xe = x.ma_xe and o.ma_yeu_cau <> %(y)s and o.trang_thai_xu_ly in ('DaXacNhan', 'DangThue')
-                  and o.thoi_gian_nhan_du_kien < %(den)s and o.thoi_gian_tra_du_kien > %(tu)s)
+                  and o.thoi_gian_nhan_du_kien < %(den)s and (case when o.trang_thai_xu_ly = 'DangThue' and o.thoi_gian_tra_thuc_te is null and o.thoi_gian_tra_du_kien <= coalesce(nullif(current_setting('tbike.now', true), '')::timestamptz, now()) then 'infinity'::timestamptz else o.thoi_gian_tra_du_kien end) > %(tu)s)
             order by (x.odo_hien_tai - x.odo_bao_duong_gan_nhat), x.ma_xe""",
             {"m": ma_xe, "y": ma_yeu_cau, "tu": tu, "den": den},
         )

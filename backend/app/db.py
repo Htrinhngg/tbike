@@ -12,6 +12,8 @@ from psycopg import Connection
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
+from . import clock
+
 _pool: ConnectionPool | None = None
 
 
@@ -41,4 +43,7 @@ def get_db() -> Iterator[Connection]:
     if _pool is None:
         raise RuntimeError("Connection pool chua duoc khoi tao")
     with _pool.connection() as conn:
+        # Gio cua ung dung cho cac cau SQL can "bay gio" (vd: don tre han chua nhan xe van giu xe).
+        # set_config(..., true): chi co hieu luc trong transaction cua request nay.
+        conn.execute("select set_config('tbike.now', %s, true)", (clock.now().isoformat(),))
         yield conn

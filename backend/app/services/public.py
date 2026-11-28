@@ -19,7 +19,7 @@ def list_vehicles(conn: Connection, tu: datetime | None, den: datetime | None, l
              case when %(tu)s::timestamptz is null then false else exists (
                select 1 from public.yeu_cau_thue o
                where o.ma_xe = x.ma_xe and o.trang_thai_xu_ly in ('DaXacNhan','DangThue')
-                 and o.thoi_gian_nhan_du_kien < %(den)s::timestamptz and o.thoi_gian_tra_du_kien > %(tu)s::timestamptz
+                 and o.thoi_gian_nhan_du_kien < %(den)s::timestamptz and (case when o.trang_thai_xu_ly = 'DangThue' and o.thoi_gian_tra_thuc_te is null and o.thoi_gian_tra_du_kien <= coalesce(nullif(current_setting('tbike.now', true), '')::timestamptz, now()) then 'infinity'::timestamptz else o.thoi_gian_tra_du_kien end) > %(tu)s::timestamptz
              ) end as trung_lich
       from public.xe x join public.bang_gia_thue g on g.loai_xe = x.loai_xe
       where (%(loai)s::text is null or x.loai_xe::text = %(loai)s::text)

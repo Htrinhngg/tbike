@@ -110,3 +110,18 @@ def test_rate_limit_on_public_lookup(client, monkeypatch):
     body = {"ma_yeu_cau": "REQ-00000001", "so_dien_thoai": "0999999999"}
     codes = [client.post("/api/public/rental-requests/lookup", json=body).status_code for _ in range(4)]
     assert codes == [404, 404, 404, 429]
+
+
+def test_overdue_unreturned_order_keeps_vehicle_busy(client, now):
+    """Don DangThue qua gio tra du kien ma chua nhan lai xe: xe van ban, khong nhan lich moi (loi phat hien khi quay demo)."""
+    # ORD-00000002 (TB002) hen tra 28/10 10:00. Luc 27/10 08:00 xe du kien ve kip -> dat 29/10 duoc.
+    ok = client.post("/api/rental-requests", json={
+        "ma_xe": "TB002", "ho_ten_khach": "Khach Truoc Han", "so_dien_thoai": "0933333333",
+        "thoi_gian_nhan_du_kien": iso(2026, 10, 29, 8), "thoi_gian_tra_du_kien": iso(2026, 10, 30, 8)})
+    assert ok.status_code == 201, ok.text
+    # 28/10 14:00: da qua gio tra 4 tieng, khach chua tra xe -> khong cho dat them, ke ca lich xa hon.
+    now.set(datetime(2026, 10, 28, 14, 0, tzinfo=VN))
+    r = client.post("/api/rental-requests", json={
+        "ma_xe": "TB002", "ho_ten_khach": "Khach Sau Han", "so_dien_thoai": "0944444444",
+        "thoi_gian_nhan_du_kien": iso(2026, 11, 2, 8), "thoi_gian_tra_du_kien": iso(2026, 11, 3, 8)})
+    assert r.status_code == 409 and r.json()["error"]["code"] == "VEHICLE_UNAVAILABLE"
